@@ -17,17 +17,17 @@ const BookManager: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { theme } = useTheme();
 
-  // Redirect non-admins or unauthenticated users to login
+
   if (!isAuthenticated || user?.role !== "admin") {
     return <Navigate to="/login" />;
   }
 
-  // Fetch books on mount
+ 
   useEffect(() => {
     dispatch(fetchBooks({ page: 1, limit: 12 }));
   }, [dispatch]);
 
-  // Calculate rating statistics
+
   const positiveCount = books.filter((book) => book.rating > 3).length;
   const negativeSum = books.reduce((sum, book) => {
     return book.rating < 0 ? sum + book.rating : sum;

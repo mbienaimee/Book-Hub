@@ -127,7 +127,7 @@ const Header: React.FC = () => {
                 </NavLink>
               </li>
               <li>
-                <NavLink
+                {/* <NavLink
                   to="/signup"
                   className={({ isActive }) =>
                     `block py-2 text-sm ${
@@ -137,7 +137,7 @@ const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Signup
-                </NavLink>
+                </NavLink> */}
               </li>
             </>
           )}

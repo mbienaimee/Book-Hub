@@ -47,7 +47,6 @@ export const login = createAsyncThunk(
     try {
       const response = await axios.post("/api/auth/login", credentials);
       return response.data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Login failed");
     }
