@@ -17,20 +17,32 @@ const uploadToCloudinary = async (
   folder: string = "books"
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(
-      file.path || file.buffer,
-      {
-        folder: `book-library/${folder}`,
-        resource_type: "auto",
-        transformation: [
-          { width: 400, height: 600, crop: "fill", quality: "auto" },
-        ],
-      },
-      (error, result) => {
+    const uploadOptions = {
+      folder: `book-library/${folder}`,
+      resource_type: "auto" as const,
+      transformation: [
+        { width: 400, height: 600, crop: "fill", quality: "auto" },
+      ],
+    };
+
+    // Handle different file input types
+    if (file.path) {
+      // File from multer disk storage
+      cloudinary.uploader.upload(file.path, uploadOptions, (error, result) => {
         if (error) reject(error);
         else resolve(result);
-      }
-    );
+      });
+    } else if (file.buffer) {
+      // File from multer memory storage
+      cloudinary.uploader
+        .upload_stream(uploadOptions, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        })
+        .end(file.buffer);
+    } else {
+      reject(new Error("Invalid file format"));
+    }
   });
 };
 
@@ -134,45 +146,42 @@ export const createBook = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    let coverImageData = {
-      url: "/placeholder.svg?height=400&width=300",
-      publicId: "",
-      cloudinaryUrl: "",
-      thumbnailUrl: "",
-    };
+    // Default cover image URL - using a simple placeholder
+    let coverImageUrl = "/placeholder.svg?height=400&width=300";
 
     // Handle Cloudinary upload if image file is provided
     if (req.file) {
       try {
-        const uploadResult = await uploadToCloudinary(req.file, "covers");
-        console.log(uploadResult);
+        console.log("File received:", {
+          originalname: req.file.originalname,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+          hasPath: !!req.file.path,
+          hasBuffer: !!req.file.buffer,
+        });
 
-        coverImageData = {
-          url: uploadResult.secure_url,
-          publicId: uploadResult.public_id,
-          cloudinaryUrl: uploadResult.secure_url,
-          thumbnailUrl: cloudinary.url(uploadResult.public_id, {
-            width: 150,
-            height: 200,
-            crop: "fill",
-            quality: "auto",
-            secure: true,
-          }),
-        };
-        console.log(coverImageData);
+        const uploadResult = await uploadToCloudinary(req.file, "covers");
+        console.log("Upload successful:", uploadResult);
+
+        // Use the secure URL directly
+        coverImageUrl = uploadResult.secure_url;
       } catch (uploadError) {
         console.error("Cloudinary upload error:", uploadError);
         return res.status(400).json({
           message: "Error uploading cover image",
+          error: uploadError,
         });
       }
     }
 
+    // Create book data with the image URL
     const bookData = {
       ...req.body,
-      coverImageUrl: coverImageData.url,
+      coverImageUrl: coverImageUrl, // Store as simple string
       addedBy: req.user!._id,
     };
+
+    console.log("Creating book with data:", bookData);
 
     const book = new Book(bookData);
     await book.save();
@@ -197,7 +206,6 @@ export const createBook = async (req: AuthRequest, res: Response) => {
     }
 
     res.status(500).json({ message: "Server error while creating book" });
-    console.log(error);
   }
 };
 
@@ -227,26 +235,10 @@ export const updateBook = async (req: AuthRequest, res: Response) => {
     // Handle new cover image upload
     if (req.file) {
       try {
-        // Delete old image from Cloudinary if exists
-        if ((book as any).coverImageUrl?.publicId) {
-          await deleteFromCloudinary((book as any).coverImageUrl.publicId);
-        }
-
-        // Upload new image
+        // Note: If you want to delete old images, you'll need to store the public_id
+        // For now, just upload the new image
         const uploadResult = await uploadToCloudinary(req.file, "covers");
-
-        updateData.coverImageUrl = {
-          url: uploadResult.secure_url,
-          publicId: uploadResult.public_id,
-          cloudinaryUrl: uploadResult.secure_url,
-          thumbnailUrl: cloudinary.url(uploadResult.public_id, {
-            width: 150,
-            height: 200,
-            crop: "fill",
-            quality: "auto",
-            secure: true,
-          }),
-        };
+        updateData.coverImageUrl = uploadResult.secure_url;
       } catch (uploadError) {
         console.error("Cloudinary upload error:", uploadError);
         return res.status(400).json({
@@ -294,15 +286,9 @@ export const deleteBook = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Delete cover image from Cloudinary if exists
-    if ((book as any).coverImageUrl?.publicId) {
-      try {
-        await deleteFromCloudinary((book as any).coverImageUrl.publicId);
-      } catch (error) {
-        console.error("Error deleting image from Cloudinary:", error);
-        // Continue with book deletion even if image deletion fails
-      }
-    }
+    // Note: If you want to delete images from Cloudinary,
+    // you'll need to extract the public_id from the URL
+    // For now, just delete the book record
 
     await Book.findByIdAndDelete(id);
 

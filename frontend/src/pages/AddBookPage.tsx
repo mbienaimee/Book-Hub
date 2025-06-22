@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { ArrowLeft, Upload, X } from "lucide-react";
 import { useAppDispatch } from "../store/hooks";
 import { createBook } from "../store/slices/bookSlice";
-import type { BookFormData } from "../types";
+import type { BookFormData } from "../types/index";
 import LoadingSpinner from "../components/Common/LoadingSpinner";
 
 const genres = [
@@ -39,6 +39,7 @@ const AddBookPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     watch,
   } = useForm<BookFormData>({
     defaultValues: {
