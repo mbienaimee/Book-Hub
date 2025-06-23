@@ -166,3 +166,75 @@ Frontend Dependencies
 "vite": "^4.4.5"
 }
 }
+=======
+
+# Book Hub - Literary Collection Management System
+
+A full-stack web application for book enthusiasts to discover, manage, and share their favorite books. Built with modern technologies and a beautiful, responsive design.
+
+## Features
+
+### Authentication & User Management
+
+- **User Registration & Login** - Secure JWT-based authentication
+- **Protected Routes** - Access control for authenticated users
+- **User Profiles** - Personalized user experience
+
+### Book Management
+
+- **Add Books** - Create new book entries with detailed information
+- **View Books** - Browse books with beautiful card layouts
+- **Edit Books** - Update book information (only by book owners)
+- **Delete Books** - Remove books from collection (only by book owners)
+- **Book Details** - Comprehensive book information pages
+
+### Discovery & Search
+
+- **Real-time Search** - Search books by title, author, or synopsis
+- **Genre Filtering** - Filter books by genre categories
+- **Responsive Grid** - Beautiful responsive book grid layout
+- **Pagination** - Efficient data loading with pagination
+
+### Media Management
+
+- **Image Upload** - Cloudinary integration for book cover images
+- **Image Optimization** - Automatic image resizing and optimization
+- **Fallback Images** - Placeholder images for books without covers
+
+### User Experience
+
+- **Responsive Design** - Works perfectly on all devices
+- **Beautiful UI** - Warm, literary-themed design
+- **Loading States** - Smooth loading indicators
+- **Toast Notifications** - User-friendly feedback messages
+- **Error Handling** - Comprehensive error management
+
+## Tech Stack
+
+### Backend
+
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **TypeScript** - Type safety and better development experience
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB object modeling
+- **JWT** - Authentication tokens
+- **bcryptjs** - Password hashing
+- **Cloudinary** - Image storage and optimization
+- **Multer** - File upload handling
+- **Express Validator** - Input validation
+- **Helmet** - Security middleware
+- **CORS** - Cross-origin resource sharing
+
+### Frontend
+
+- **React 18** - UI library with latest features
+- **TypeScript** - Type safety and better development experience
+- **Redux Toolkit** - State management
+- **React Router** - Client-side routing
+- **React Hook Form** - Form handling and validation
+- **Axios** - HTTP client
+- **Tailwind CSS** - Utility-first CSS framework
+- **Lucide React** - Beautiful icons
+- **React Hot Toast** - Toast notifications
+- **Vite** - Fast build tool and development server
